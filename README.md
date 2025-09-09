@@ -1,8 +1,10 @@
-# StealthShark Anti-Pineapple Detection System v1.0
+# StealthShark Anti-Pineapple Detection System v1.1
 **AIMF LLC - MobileShield Ecosystem**
 
 ## 🦈 Overview
 StealthShark is an advanced WiFi security tool designed to detect and block pineapple attacks, rogue access points, and other wireless threats. This system provides real-time protection by maintaining a blacklist of malicious BSSIDs and automatically excluding your trusted networks.
+
+**Latest Update:** Enhanced CSV import protection with auto-exclusion of current WiFi network.
 
 ## ✨ Key Features
 - **🛡️ Real-time Pineapple Detection** - Identifies and blocks malicious WiFi access points

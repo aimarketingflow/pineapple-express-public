@@ -1,6 +1,590 @@
 {
-    "blocked_bssids": {},
-    "version": "1.0",
-    "created": "2025-09-09",
-    "description": "StealthShark Anti-Pineapple BSSID Blacklist - Clean installation"
+  "72:13:01:8A:70:DA": {
+    "reason": "TRUSTED_NETWORK",
+    "timestamp": "2025-09-09T14:32:34.872829",
+    "status": "protected",
+    "ssid": "RoomForSaints"
+  },
+  "83:F6": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.875951",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "BB:FC": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.875974",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "BB:F8": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.875980",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "BB:F4": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.875983",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "5E:A4": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.875988",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "88:17": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.875992",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "08:D8": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.875997",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "08:D0": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876001",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "08:D1": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876005",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "17:55": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876008",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "5E:AC": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876025",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "BB:FF": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876030",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "CC:FA": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876034",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "87:A7": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876038",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "ED:C2": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876043",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "72:2A": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876047",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "57:EE": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876051",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "57:EF": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876056",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "3E:AE": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876062",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "D3:1E": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876072",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "5E:AF": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876076",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "ED:C3": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876082",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "AA:64": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876087",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "70:D9": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876091",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "70:DE": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876095",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "70:DF": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876100",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "70:DC": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876108",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "70:DD": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876112",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "70:DA": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876117",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "68:08": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876121",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "68:0E": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876127",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "A2:34": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876131",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "D3:1F": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876136",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "64:62": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876140",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "91:78": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876145",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "87:A6": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876153",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "43:83": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876160",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "54:1C": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876164",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "56:40": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876169",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "0B:A0": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876173",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "6F:1A": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876178",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "72:02": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876182",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "5A:04": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876192",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "A4:10": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876196",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "6B:E3": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876200",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "9A:A7": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876204",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "72:29": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876209",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "D7:DA": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876214",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "50:10": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876219",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "6C:5D": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876224",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "D5:1B": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876228",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "97:55": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876235",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "9D:44": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876241",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "9D:45": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876245",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "7B:AD": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876250",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "28:4A": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876254",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "D6:23": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876258",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "9F:8B": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876262",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "5A:D8": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876265",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "5E:A8": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876269",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "05:40": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876273",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "D6:26": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876277",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "A0:31": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876281",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "A0:04": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876285",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "41:37": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876289",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "31:A6": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876294",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "A0:05": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876298",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "69:36": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876303",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "39:38": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876311",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "58:38": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876315",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "40:05": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876320",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "1D:58": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876324",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "E1:F2": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876329",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "BE:92": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876334",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "FC:6F": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876339",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "20:16": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876344",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "31:AC": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876348",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "31:A9": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876355",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "CE:97": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876360",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "BE:64": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876365",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "91:74": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876369",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "32:0E": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876374",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "75:06": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876378",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "A0:35": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876383",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "5E:22": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876387",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "A0:33": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876394",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "DC:54": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876401",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "BE:94": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876405",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "E1:7B": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876409",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "4B:5A": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876414",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "75:01": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876418",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "31:AB": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876423",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "B1:4C": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876428",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "D6:20": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876432",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "D6:25": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876437",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "5E:4A": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876441",
+    "status": "blocked",
+    "source": "recovered_logs"
+  },
+  "72:01": {
+    "reason": "PINEAPPLE_ATTACK_DETECTED",
+    "timestamp": "2025-09-09T14:32:34.876446",
+    "status": "blocked",
+    "source": "recovered_logs"
+  }
 }

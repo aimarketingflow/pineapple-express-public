@@ -399,21 +399,6 @@ class CSVImportDialog(QDialog):
         
         # Import networks
         imported_count = 0
-        failed_count = 0
-        trusted_skipped = 0
-        
-        # Get current connected network info for auto-exclusion
-        # Users should update these values for their own network
-        current_bssid = "YOUR_NETWORK_BSSID_HERE"  # Replace with your network's BSSID
-        current_ssid = "YOUR_NETWORK_NAME_HERE"    # Replace with your network's SSID
-        
-        for network in selected_networks:
-            bssid = network.get('bssid', '').upper()
-            ssid = network.get('ssid', 'Unknown')
-            reason = f"CSV Import: {ssid}"
-            
-            # Skip current connected network (by BSSID or SSID)
-            if bssid == current_bssid or ssid == current_ssid:
                 trusted_skipped += 1
                 print(f"🛡️ Auto-excluded current network: {ssid} ({bssid}) - protecting connected WiFi")
                 continue

@@ -96,10 +96,8 @@ class SimpleAntiPineappleGUI(QMainWindow):
         self.setGeometry(100, 100, 1000, 700)
         
         # Get current connected network info for auto-exclusion
-        # Users should update these values for their own network
-        current_bssid = "YOUR_NETWORK_BSSID_HERE"  # Replace with your network's BSSID
-        current_ssid = "YOUR_NETWORK_NAME_HERE"    # Replace with your network's SSID
-        self.threat_count = 0
+        current_bssid = "72:13:01:8A:70:DA"  # WhySoSeriousi network
+        current_ssid = "WhySoSeriousi" 
         self.authenticated = False
         self.firewall_enabled = False
         self.blocked_bssids = set()
