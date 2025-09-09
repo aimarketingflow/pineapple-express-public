@@ -1,0 +1,24 @@
+# Pineapple Detector Requirements
+# Generated on 2025-08-27
+
+# Core Python packages (built-in, no additional installs needed)
+# - subprocess
+# - json
+# - time
+# - datetime
+# - re
+# - sys
+# - dataclasses
+# - typing
+# - logging
+# - argparse
+# - os
+
+# Note: This project uses only Python standard library modules
+# No external dependencies required for basic functionality
+
+# Optional enhancements (uncomment if needed):
+# requests>=2.28.0          # For web-based alerting
+# psutil>=5.9.0            # For enhanced system monitoring
+# scapy>=2.4.5             # For advanced packet analysis
+# colorama>=0.4.6          # For colored terminal output
