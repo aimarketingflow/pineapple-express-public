@@ -1,0 +1,43 @@
+{
+  "common_ports": [
+    "3000",
+    "3001",
+    "8000",
+    "8080",
+    "9000",
+    "3306",
+    "5432",
+    "6379",
+    "27017",
+    "4000",
+    "5000"
+  ],
+  "development_ports": [
+    3000,
+    3001,
+    8000,
+    8080,
+    9000,
+    4000,
+    5000
+  ],
+  "database_ports": [
+    3306,
+    5432,
+    6379,
+    27017
+  ],
+  "port_names": {
+    "3000": "Node.js Dev Server",
+    "3001": "React Dev Server",
+    "8000": "Python HTTP Server",
+    "8080": "HTTP Proxy/Alt",
+    "9000": "Development Tools",
+    "3306": "MySQL",
+    "5432": "PostgreSQL",
+    "6379": "Redis",
+    "27017": "MongoDB",
+    "4000": "Development Server",
+    "5000": "Flask Server"
+  }
+}

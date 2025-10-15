@@ -258,7 +258,7 @@ class CSVImportDialog(QDialog):
         """Browse for CSV file"""
         file_path, _ = QFileDialog.getOpenFileName(
             self, "Select CSV File", 
-            "/Users/flowgirl/Documents/_MobileShield/PineappleExpress/_Chatlogs_Pineapple/",
+            str(Path.home() / "Documents"),
             "CSV Files (*.csv);;All Files (*)")
         
         if file_path:

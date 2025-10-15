@@ -13,6 +13,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 import threading
 import time
+import configparser
 
 from PyQt6.QtWidgets import *
 from PyQt6.QtCore import *
@@ -96,8 +97,9 @@ class SimpleAntiPineappleGUI(QMainWindow):
         self.setGeometry(100, 100, 1000, 700)
         
         # Get current connected network info for auto-exclusion
-        current_bssid = "72:13:01:8A:70:DA"  # WhySoSeriousi network
-        current_ssid = "WhySoSeriousi" 
+        self.legitimate_bssid = "72:13:01:8A:70:DA"  # WhySoSeriousi network
+        self.current_ssid = "WhySoSeriousi" 
+        self.threat_count = 0
         self.authenticated = False
         self.firewall_enabled = False
         self.blocked_bssids = set()
@@ -105,11 +107,27 @@ class SimpleAntiPineappleGUI(QMainWindow):
         # File paths
         self.auth_profile_path = Path.home() / '.ssh' / 'anti_pineapple_auth.json'
         self.tags_path = Path.home() / '.ssh' / 'nfc_tags.json'
+        self.settings_path = Path.home() / '.ssh' / 'stealthshark_settings.json'
         self.registered_tags = []
+        
+        # Default settings
+        self.settings = {
+            'monitoring_duration': 6,  # hours
+            'auto_start': False,
+            'scan_interval': 5,  # seconds
+            'threat_notifications': True,
+            'auto_block_threats': True,
+            'minimize_to_tray': False
+        }
+        
+        # Monitoring timer
+        self.monitoring_timer = None
+        self.monitoring_start_time = None
         
         # Load existing data
         self.load_authentication_status()
         self.load_registered_tags()
+        self.load_settings()
         self.detect_current_network()
         
         print("✅ Settings configured")
@@ -197,11 +215,13 @@ class SimpleAntiPineappleGUI(QMainWindow):
         self.auth_tab = self.create_auth_tab()
         self.tags_tab = self.create_tags_tab()
         self.monitor_tab = self.create_monitor_tab()
+        self.settings_tab = self.create_settings_tab()
         
         self.tabs.addTab(self.dashboard_tab, "🛡️ Dashboard")
         self.tabs.addTab(self.auth_tab, "🔐 NFC Auth")
         self.tabs.addTab(self.tags_tab, "🏷️ Tags")
         self.tabs.addTab(self.monitor_tab, "📡 Monitor")
+        self.tabs.addTab(self.settings_tab, "⚙️ Settings")
         
         # Add CSV Import tab
         self.csv_tab = self.create_csv_tab()
@@ -826,6 +846,265 @@ class SimpleAntiPineappleGUI(QMainWindow):
         widget.setLayout(layout)
         return widget
     
+    def create_settings_tab(self):
+        """Create settings configuration tab"""
+        widget = QWidget()
+        layout = QVBoxLayout()
+        
+        # Header
+        header = QLabel("⚙️ StealthShark Settings")
+        header.setStyleSheet("font-size: 20px; font-weight: bold; color: #4fc3f7; padding: 10px;")
+        header.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(header)
+        
+        # Monitoring Settings Group
+        monitoring_group = QGroupBox("📡 Monitoring Settings")
+        monitoring_layout = QVBoxLayout()
+        
+        # Monitoring Duration
+        duration_layout = QHBoxLayout()
+        duration_label = QLabel("Default Monitoring Duration:")
+        duration_label.setStyleSheet("font-size: 14px; padding: 5px;")
+        duration_layout.addWidget(duration_label)
+        
+        self.duration_spinbox = QSpinBox()
+        self.duration_spinbox.setRange(1, 24)
+        self.duration_spinbox.setValue(self.settings['monitoring_duration'])
+        self.duration_spinbox.setSuffix(" hours")
+        self.duration_spinbox.setStyleSheet("""
+            QSpinBox {
+                background-color: #3a3a3a;
+                color: #e0e0e0;
+                border: 1px solid #4a4a4a;
+                padding: 5px;
+                border-radius: 4px;
+                font-size: 14px;
+            }
+        """)
+        self.duration_spinbox.valueChanged.connect(self.update_monitoring_duration)
+        duration_layout.addWidget(self.duration_spinbox)
+        duration_layout.addStretch()
+        monitoring_layout.addLayout(duration_layout)
+        
+        # Scan Interval
+        interval_layout = QHBoxLayout()
+        interval_label = QLabel("Network Scan Interval:")
+        interval_label.setStyleSheet("font-size: 14px; padding: 5px;")
+        interval_layout.addWidget(interval_label)
+        
+        self.interval_spinbox = QSpinBox()
+        self.interval_spinbox.setRange(1, 60)
+        self.interval_spinbox.setValue(self.settings['scan_interval'])
+        self.interval_spinbox.setSuffix(" seconds")
+        self.interval_spinbox.setStyleSheet("""
+            QSpinBox {
+                background-color: #3a3a3a;
+                color: #e0e0e0;
+                border: 1px solid #4a4a4a;
+                padding: 5px;
+                border-radius: 4px;
+                font-size: 14px;
+            }
+        """)
+        self.interval_spinbox.valueChanged.connect(self.update_scan_interval)
+        interval_layout.addWidget(self.interval_spinbox)
+        interval_layout.addStretch()
+        monitoring_layout.addLayout(interval_layout)
+        
+        # Monitoring Status
+        self.monitoring_status = QLabel("⏱️ Monitoring Status: Ready")
+        self.monitoring_status.setStyleSheet("font-size: 14px; padding: 10px; color: #4fc3f7; font-weight: bold;")
+        monitoring_layout.addWidget(self.monitoring_status)
+        
+        monitoring_group.setLayout(monitoring_layout)
+        layout.addWidget(monitoring_group)
+        
+        # Auto-Start Settings Group
+        autostart_group = QGroupBox("🚀 Auto-Start Settings")
+        autostart_layout = QVBoxLayout()
+        
+        # Auto-start checkbox
+        self.autostart_checkbox = QCheckBox("Start StealthShark automatically when computer boots")
+        self.autostart_checkbox.setChecked(self.settings['auto_start'])
+        self.autostart_checkbox.setStyleSheet("""
+            QCheckBox {
+                color: #e0e0e0;
+                font-size: 14px;
+                padding: 5px;
+            }
+            QCheckBox::indicator {
+                width: 18px;
+                height: 18px;
+            }
+            QCheckBox::indicator:unchecked {
+                background-color: #3a3a3a;
+                border: 2px solid #4a4a4a;
+                border-radius: 3px;
+            }
+            QCheckBox::indicator:checked {
+                background-color: #4fc3f7;
+                border: 2px solid #4fc3f7;
+                border-radius: 3px;
+            }
+        """)
+        self.autostart_checkbox.toggled.connect(self.toggle_autostart)
+        autostart_layout.addWidget(self.autostart_checkbox)
+        
+        # Auto-start status
+        self.autostart_status = QLabel("❌ Auto-start: Disabled")
+        if self.settings['auto_start']:
+            self.autostart_status.setText("✅ Auto-start: Enabled")
+            self.autostart_status.setStyleSheet("color: #66bb6a; font-size: 12px; padding: 5px;")
+        else:
+            self.autostart_status.setStyleSheet("color: #ff5252; font-size: 12px; padding: 5px;")
+        autostart_layout.addWidget(self.autostart_status)
+        
+        # Install/Uninstall auto-start buttons
+        autostart_buttons = QHBoxLayout()
+        
+        install_autostart_btn = QPushButton("📥 Install Auto-Start")
+        install_autostart_btn.clicked.connect(self.install_autostart)
+        install_autostart_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #4caf50;
+                color: white;
+                padding: 8px 16px;
+                border-radius: 4px;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background-color: #66bb6a;
+            }
+        """)
+        autostart_buttons.addWidget(install_autostart_btn)
+        
+        uninstall_autostart_btn = QPushButton("🗑️ Remove Auto-Start")
+        uninstall_autostart_btn.clicked.connect(self.uninstall_autostart)
+        uninstall_autostart_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #f44336;
+                color: white;
+                padding: 8px 16px;
+                border-radius: 4px;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background-color: #ef5350;
+            }
+        """)
+        autostart_buttons.addWidget(uninstall_autostart_btn)
+        
+        autostart_buttons.addStretch()
+        autostart_layout.addLayout(autostart_buttons)
+        
+        autostart_group.setLayout(autostart_layout)
+        layout.addWidget(autostart_group)
+        
+        # Notification Settings Group
+        notification_group = QGroupBox("🔔 Notification Settings")
+        notification_layout = QVBoxLayout()
+        
+        # Threat notifications
+        self.threat_notifications_checkbox = QCheckBox("Show threat detection notifications")
+        self.threat_notifications_checkbox.setChecked(self.settings['threat_notifications'])
+        self.threat_notifications_checkbox.setStyleSheet("""
+            QCheckBox {
+                color: #e0e0e0;
+                font-size: 14px;
+                padding: 5px;
+            }
+            QCheckBox::indicator {
+                width: 18px;
+                height: 18px;
+            }
+            QCheckBox::indicator:unchecked {
+                background-color: #3a3a3a;
+                border: 2px solid #4a4a4a;
+                border-radius: 3px;
+            }
+            QCheckBox::indicator:checked {
+                background-color: #4fc3f7;
+                border: 2px solid #4fc3f7;
+                border-radius: 3px;
+            }
+        """)
+        self.threat_notifications_checkbox.toggled.connect(self.toggle_threat_notifications)
+        notification_layout.addWidget(self.threat_notifications_checkbox)
+        
+        # Auto-block threats
+        self.auto_block_checkbox = QCheckBox("Automatically block detected threats")
+        self.auto_block_checkbox.setChecked(self.settings['auto_block_threats'])
+        self.auto_block_checkbox.setStyleSheet("""
+            QCheckBox {
+                color: #e0e0e0;
+                font-size: 14px;
+                padding: 5px;
+            }
+            QCheckBox::indicator {
+                width: 18px;
+                height: 18px;
+            }
+            QCheckBox::indicator:unchecked {
+                background-color: #3a3a3a;
+                border: 2px solid #4a4a4a;
+                border-radius: 3px;
+            }
+            QCheckBox::indicator:checked {
+                background-color: #4fc3f7;
+                border: 2px solid #4fc3f7;
+                border-radius: 3px;
+            }
+        """)
+        self.auto_block_checkbox.toggled.connect(self.toggle_auto_block)
+        notification_layout.addWidget(self.auto_block_checkbox)
+        
+        notification_group.setLayout(notification_layout)
+        layout.addWidget(notification_group)
+        
+        # Control buttons
+        control_layout = QHBoxLayout()
+        
+        save_settings_btn = QPushButton("💾 Save Settings")
+        save_settings_btn.clicked.connect(self.save_settings)
+        save_settings_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #2196f3;
+                color: white;
+                padding: 10px 20px;
+                border-radius: 4px;
+                font-weight: bold;
+                font-size: 14px;
+            }
+            QPushButton:hover {
+                background-color: #42a5f5;
+            }
+        """)
+        control_layout.addWidget(save_settings_btn)
+        
+        reset_settings_btn = QPushButton("🔄 Reset to Defaults")
+        reset_settings_btn.clicked.connect(self.reset_settings)
+        reset_settings_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #ff9800;
+                color: white;
+                padding: 10px 20px;
+                border-radius: 4px;
+                font-weight: bold;
+                font-size: 14px;
+            }
+            QPushButton:hover {
+                background-color: #ffb74d;
+            }
+        """)
+        control_layout.addWidget(reset_settings_btn)
+        
+        control_layout.addStretch()
+        layout.addLayout(control_layout)
+        
+        layout.addStretch()
+        widget.setLayout(layout)
+        return widget
+    
     def refresh_blacklist_display(self):
         """Refresh the blacklist display table"""
         if hasattr(self, 'blacklist_manager') and self.blacklist_manager:
@@ -1145,6 +1424,199 @@ class SimpleAntiPineappleGUI(QMainWindow):
                         border-radius: 5px;
                     }
                 """)
+    
+    # Settings management methods
+    def load_settings(self):
+        """Load settings from file"""
+        try:
+            if self.settings_path.exists():
+                with open(self.settings_path, 'r') as f:
+                    saved_settings = json.load(f)
+                    self.settings.update(saved_settings)
+        except Exception as e:
+            print(f"Error loading settings: {e}")
+    
+    def save_settings(self):
+        """Save current settings to file"""
+        try:
+            self.settings_path.parent.mkdir(exist_ok=True)
+            with open(self.settings_path, 'w') as f:
+                json.dump(self.settings, f, indent=2)
+            QMessageBox.information(self, "✅ Settings Saved", "Settings have been saved successfully!")
+            self.apply_settings()
+        except Exception as e:
+            QMessageBox.critical(self, "❌ Save Error", f"Failed to save settings:\n{e}")
+    
+    def reset_settings(self):
+        """Reset settings to defaults"""
+        reply = QMessageBox.question(self, "Reset Settings", 
+            "Reset all settings to default values?\n\nThis cannot be undone.",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+        
+        if reply == QMessageBox.StandardButton.Yes:
+            self.settings = {
+                'monitoring_duration': 6,
+                'auto_start': False,
+                'scan_interval': 5,
+                'threat_notifications': True,
+                'auto_block_threats': True,
+                'minimize_to_tray': False
+            }
+            self.update_settings_ui()
+            self.save_settings()
+    
+    def update_settings_ui(self):
+        """Update settings UI elements with current values"""
+        if hasattr(self, 'duration_spinbox'):
+            self.duration_spinbox.setValue(self.settings['monitoring_duration'])
+        if hasattr(self, 'interval_spinbox'):
+            self.interval_spinbox.setValue(self.settings['scan_interval'])
+        if hasattr(self, 'autostart_checkbox'):
+            self.autostart_checkbox.setChecked(self.settings['auto_start'])
+        if hasattr(self, 'threat_notifications_checkbox'):
+            self.threat_notifications_checkbox.setChecked(self.settings['threat_notifications'])
+        if hasattr(self, 'auto_block_checkbox'):
+            self.auto_block_checkbox.setChecked(self.settings['auto_block_threats'])
+    
+    def apply_settings(self):
+        """Apply current settings to the application"""
+        # Update scan timer interval
+        if hasattr(self, 'scan_timer'):
+            self.scan_timer.setInterval(self.settings['scan_interval'] * 1000)
+        
+        # Start monitoring timer if duration is set
+        self.start_monitoring_timer()
+    
+    def update_monitoring_duration(self, value):
+        """Update monitoring duration setting"""
+        self.settings['monitoring_duration'] = value
+        self.start_monitoring_timer()
+    
+    def update_scan_interval(self, value):
+        """Update scan interval setting"""
+        self.settings['scan_interval'] = value
+        if hasattr(self, 'scan_timer'):
+            self.scan_timer.setInterval(value * 1000)
+    
+    def toggle_autostart(self, checked):
+        """Toggle auto-start setting"""
+        self.settings['auto_start'] = checked
+        if hasattr(self, 'autostart_status'):
+            if checked:
+                self.autostart_status.setText("✅ Auto-start: Enabled")
+                self.autostart_status.setStyleSheet("color: #66bb6a; font-size: 12px; padding: 5px;")
+            else:
+                self.autostart_status.setText("❌ Auto-start: Disabled")
+                self.autostart_status.setStyleSheet("color: #ff5252; font-size: 12px; padding: 5px;")
+    
+    def toggle_threat_notifications(self, checked):
+        """Toggle threat notifications setting"""
+        self.settings['threat_notifications'] = checked
+    
+    def toggle_auto_block(self, checked):
+        """Toggle auto-block threats setting"""
+        self.settings['auto_block_threats'] = checked
+    
+    def start_monitoring_timer(self):
+        """Start the monitoring duration timer"""
+        if self.monitoring_timer:
+            self.monitoring_timer.stop()
+        
+        duration_hours = self.settings['monitoring_duration']
+        duration_ms = duration_hours * 60 * 60 * 1000  # Convert hours to milliseconds
+        
+        self.monitoring_timer = QTimer()
+        self.monitoring_timer.setSingleShot(True)
+        self.monitoring_timer.timeout.connect(self.monitoring_timeout)
+        self.monitoring_timer.start(duration_ms)
+        
+        self.monitoring_start_time = datetime.now()
+        
+        if hasattr(self, 'monitoring_status'):
+            end_time = self.monitoring_start_time + timedelta(hours=duration_hours)
+            self.monitoring_status.setText(f"⏱️ Monitoring until {end_time.strftime('%H:%M:%S')} ({duration_hours}h)")
+            self.monitoring_status.setStyleSheet("font-size: 14px; padding: 10px; color: #66bb6a; font-weight: bold;")
+        
+        print(f"🕐 Monitoring timer started for {duration_hours} hours")
+    
+    def monitoring_timeout(self):
+        """Handle monitoring timeout"""
+        if hasattr(self, 'monitoring_status'):
+            self.monitoring_status.setText("⏱️ Monitoring Complete - Timer Expired")
+            self.monitoring_status.setStyleSheet("font-size: 14px; padding: 10px; color: #ffa726; font-weight: bold;")
+        
+        if self.settings['threat_notifications']:
+            QMessageBox.information(self, "⏰ Monitoring Complete", 
+                f"StealthShark has completed {self.settings['monitoring_duration']} hours of monitoring.\n\n"
+                "You can restart monitoring from the Settings tab.")
+        
+        print(f"⏰ Monitoring timer expired after {self.settings['monitoring_duration']} hours")
+    
+    def install_autostart(self):
+        """Install auto-start LaunchAgent"""
+        try:
+            launchagents_dir = Path.home() / "Library" / "LaunchAgents"
+            launchagents_dir.mkdir(exist_ok=True)
+            
+            # Get the script directory (parent of anti_pineapple_gui)
+            script_dir = Path(__file__).parent.parent
+            plist_source = script_dir / "Desktop_Shortcuts" / "com.aimfllc.stealthshark.plist"
+            plist_dest = launchagents_dir / "com.aimfllc.stealthshark.plist"
+            
+            if plist_source.exists():
+                import shutil
+                shutil.copy2(plist_source, plist_dest)
+                
+                # Load the LaunchAgent
+                subprocess.run(['launchctl', 'load', str(plist_dest)], check=True)
+                
+                self.settings['auto_start'] = True
+                self.autostart_checkbox.setChecked(True)
+                self.autostart_status.setText("✅ Auto-start: Installed & Enabled")
+                self.autostart_status.setStyleSheet("color: #66bb6a; font-size: 12px; padding: 5px;")
+                
+                QMessageBox.information(self, "✅ Auto-Start Installed", 
+                    "StealthShark will now start automatically when you log in.\n\n"
+                    "The application will launch minimized and begin monitoring immediately.")
+            else:
+                QMessageBox.warning(self, "❌ Installation Error", 
+                    "Auto-start configuration file not found.\n\n"
+                    "Please ensure the Desktop_Shortcuts folder contains the required files.")
+                
+        except subprocess.CalledProcessError as e:
+            QMessageBox.critical(self, "❌ Installation Failed", 
+                f"Failed to install auto-start:\n{e}\n\n"
+                "You may need to grant permissions in System Preferences.")
+        except Exception as e:
+            QMessageBox.critical(self, "❌ Installation Error", f"Error installing auto-start:\n{e}")
+    
+    def uninstall_autostart(self):
+        """Uninstall auto-start LaunchAgent"""
+        try:
+            launchagents_dir = Path.home() / "Library" / "LaunchAgents"
+            plist_file = launchagents_dir / "com.aimfllc.stealthshark.plist"
+            
+            if plist_file.exists():
+                # Unload the LaunchAgent
+                subprocess.run(['launchctl', 'unload', str(plist_file)], check=False)
+                
+                # Remove the plist file
+                plist_file.unlink()
+                
+                self.settings['auto_start'] = False
+                self.autostart_checkbox.setChecked(False)
+                self.autostart_status.setText("❌ Auto-start: Removed")
+                self.autostart_status.setStyleSheet("color: #ff5252; font-size: 12px; padding: 5px;")
+                
+                QMessageBox.information(self, "✅ Auto-Start Removed", 
+                    "Auto-start has been disabled.\n\n"
+                    "StealthShark will no longer start automatically at login.")
+            else:
+                QMessageBox.information(self, "ℹ️ Not Installed", 
+                    "Auto-start is not currently installed.")
+                
+        except Exception as e:
+            QMessageBox.critical(self, "❌ Removal Error", f"Error removing auto-start:\n{e}")
 
 
 def main():

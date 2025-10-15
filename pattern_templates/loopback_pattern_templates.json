@@ -1,0 +1,227 @@
+{
+  "metadata": {
+    "generated": "2025-09-06T22:41:34.354897",
+    "source": "StealthShark Historical Analysis",
+    "version": "1.0"
+  },
+  "common_development_patterns": {
+    "web_development": {
+      "ports": [
+        3000,
+        3001,
+        8000,
+        8080,
+        8081,
+        9000
+      ],
+      "signatures": [
+        "node.js",
+        "react",
+        "webpack",
+        "vite",
+        "next.js"
+      ],
+      "typical_connections": [
+        "ephemeral->3000",
+        "ephemeral->8080",
+        "3000->3000"
+      ]
+    },
+    "database_services": {
+      "ports": [
+        3306,
+        5432,
+        6379,
+        27017,
+        9200,
+        5984
+      ],
+      "signatures": [
+        "mysql",
+        "postgresql",
+        "redis",
+        "mongodb",
+        "elasticsearch"
+      ],
+      "typical_connections": [
+        "ephemeral->3306",
+        "ephemeral->5432",
+        "ephemeral->6379"
+      ]
+    },
+    "api_development": {
+      "ports": [
+        8000,
+        8080,
+        4000,
+        5000,
+        8443,
+        9090
+      ],
+      "signatures": [
+        "flask",
+        "express",
+        "fastapi",
+        "spring-boot"
+      ],
+      "typical_connections": [
+        "ephemeral->8000",
+        "ephemeral->4000"
+      ]
+    }
+  },
+  "behavioral_signatures": {
+    "development_server_startup": {
+      "pattern": "rapid_connections_to_dev_ports",
+      "indicators": [
+        "multiple_connections_per_second",
+        "port_3000_activity",
+        "websocket_upgrades"
+      ],
+      "confidence": 0.85
+    },
+    "database_connection_pool": {
+      "pattern": "persistent_db_connections",
+      "indicators": [
+        "long_lived_connections",
+        "regular_keepalives",
+        "connection_reuse"
+      ],
+      "confidence": 0.9
+    },
+    "hot_reload_activity": {
+      "pattern": "file_watcher_notifications",
+      "indicators": [
+        "frequent_short_connections",
+        "json_payloads",
+        "websocket_messages"
+      ],
+      "confidence": 0.75
+    }
+  },
+  "anomaly_detection_rules": {
+    "unusual_port_activity": {
+      "rule": "new_port_outside_common_ranges",
+      "threshold": "ports_not_in_predefined_list",
+      "action": "flag_for_review"
+    },
+    "high_frequency_connections": {
+      "rule": "connection_rate_above_baseline",
+      "threshold": ">100_connections_per_minute",
+      "action": "monitor_closely"
+    },
+    "unexpected_protocols": {
+      "rule": "non_tcp_udp_on_loopback",
+      "threshold": "unusual_protocol_stack",
+      "action": "investigate"
+    }
+  },
+  "port_classifications": {
+    "3000": {
+      "app": "Node.js Dev Server",
+      "category": "development",
+      "risk": "low"
+    },
+    "3001": {
+      "app": "React Dev Server",
+      "category": "development",
+      "risk": "low"
+    },
+    "8000": {
+      "app": "Python HTTP Server",
+      "category": "development",
+      "risk": "low"
+    },
+    "8080": {
+      "app": "HTTP Proxy/Alt",
+      "category": "development",
+      "risk": "low"
+    },
+    "9000": {
+      "app": "Development Tools",
+      "category": "development",
+      "risk": "low"
+    },
+    "3306": {
+      "app": "MySQL",
+      "category": "database",
+      "risk": "medium"
+    },
+    "5432": {
+      "app": "PostgreSQL",
+      "category": "database",
+      "risk": "medium"
+    },
+    "6379": {
+      "app": "Redis",
+      "category": "database",
+      "risk": "medium"
+    },
+    "27017": {
+      "app": "MongoDB",
+      "category": "database",
+      "risk": "medium"
+    },
+    "4000": {
+      "app": "Development Server",
+      "category": "development",
+      "risk": "low"
+    },
+    "5000": {
+      "app": "Flask Server",
+      "category": "development",
+      "risk": "low"
+    }
+  },
+  "historical_analysis": {
+    "files_analyzed": 27,
+    "active_ports": "set()",
+    "connection_patterns": [],
+    "recent_activity": {
+      "20250831_160609": {
+        "file_size": 13545201,
+        "has_loopback_data": true
+      },
+      "20250904_123421": {
+        "file_size": 19108218,
+        "has_loopback_data": true
+      },
+      "20250903_191037": {
+        "file_size": 685280563,
+        "has_loopback_data": true
+      },
+      "20250906_195613": {
+        "file_size": 187023360,
+        "has_loopback_data": true
+      },
+      "20250906_135520": {
+        "file_size": 337339580,
+        "has_loopback_data": true
+      }
+    }
+  },
+  "pattern_matching_rules": {
+    "development_environment_detection": {
+      "required_indicators": [
+        "port_3000_or_8080_activity",
+        "frequent_connections"
+      ],
+      "optional_indicators": [
+        "websocket_traffic",
+        "json_payloads"
+      ],
+      "confidence_threshold": 0.7
+    },
+    "database_activity_detection": {
+      "required_indicators": [
+        "database_port_connections",
+        "persistent_connections"
+      ],
+      "optional_indicators": [
+        "query_patterns",
+        "connection_pooling"
+      ],
+      "confidence_threshold": 0.8
+    }
+  }
+}

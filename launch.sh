@@ -53,7 +53,15 @@ fi
 
 echo ""
 echo "🚀 Launching StealthShark Anti-Pineapple GUI..."
-python3 anti_pineapple_gui/simple_gui.py
+
+# Check for auto-start mode
+if [[ "$1" == "--auto-start" ]]; then
+    echo "🤖 Auto-start mode detected - launching minimized"
+    python3 anti_pineapple_gui/simple_gui.py --auto-start &
+    echo "✅ StealthShark started in background monitoring mode"
+else
+    python3 anti_pineapple_gui/simple_gui.py
+fi
 
 # Keep terminal open if there's an error
 if [ $? -ne 0 ]; then

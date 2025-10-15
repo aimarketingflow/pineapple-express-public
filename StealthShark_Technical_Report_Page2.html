@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StealthShark Technical Report - Layer 1 & 2 Architecture</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .content {
+            padding: 40px;
+        }
+        h1 {
+            color: #27ae60;
+            border-bottom: 3px solid #27ae60;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #2c3e50;
+            margin-top: 30px;
+        }
+        .layer-diagram {
+            background: #f8f9fa;
+            border: 2px solid #27ae60;
+            border-radius: 10px;
+            padding: 30px;
+            margin: 20px 0;
+        }
+        .usb-flow {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .usb-step {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 5px;
+            flex: 1;
+            min-width: 180px;
+            text-align: center;
+        }
+        .nfc-flow {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .nfc-step {
+            background: linear-gradient(135deg, #3498db 0%, #5dade2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 5px;
+            flex: 1;
+            min-width: 180px;
+            text-align: center;
+        }
+        .arrow {
+            font-size: 2em;
+            color: #27ae60;
+            margin: 0 10px;
+        }
+        .code-block {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+        .metadata-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .metadata-card {
+            background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .security-feature {
+            background: #e8f5e8;
+            border-left: 4px solid #27ae60;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .footer {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .page-number {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: #27ae60;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 Layer 1: USB Ambient Capture Architecture</h1>
+            <h2>🏷️ Layer 2: NFC Authentication Gateway</h2>
+        </div>
+
+        <div class="content">
+            <h1>Layer 1: USB Ambient Capture & Metadata Preservation</h1>
+            
+            <h2>🔬 Technical Implementation</h2>
+            <p>The USB Ambient Capture system creates an immutable baseline of your hardware environment by continuously monitoring USB device signatures, electromagnetic patterns, and system-level hardware interactions. This forensic-grade data collection enables detection of hardware-based attacks and provides tamper-evident security.</p>
+
+            <div class="layer-diagram">
+                <h3>USB Monitoring Data Flow</h3>
+                <div class="usb-flow">
+                    <div class="usb-step">
+                        <strong>USB Device Enumeration</strong><br>
+                        Monitor device connections/disconnections
+                    </div>
+                    <div class="arrow">→</div>
+                    <div class="usb-step">
+                        <strong>Signature Analysis</strong><br>
+                        Extract hardware fingerprints
+                    </div>
+                    <div class="arrow">→</div>
+                    <div class="usb-step">
+                        <strong>Metadata Preservation</strong><br>
+                        Store in fixed secure locations
+                    </div>
+                    <div class="arrow">→</div>
+                    <div class="usb-step">
+                        <strong>Baseline Comparison</strong><br>
+                        Detect anomalous hardware
+                    </div>
+                </div>
+            </div>
+
+            <div class="code-block">
+# USB Security Monitor - Core Implementation
+class USBSecurityMonitor:
+    def __init__(self):
+        self.baseline_devices = self.load_hardware_baseline()
+        self.metadata_store = Path("/secure/usb_metadata/")
+        
+    def monitor_usb_events(self):
+        for event in self.usb_event_stream():
+            signature = self.extract_device_signature(event)
+            metadata = {
+                'timestamp': datetime.utcnow(),
+                'device_id': signature.device_id,
+                'vendor_id': signature.vendor_id,
+                'electromagnetic_pattern': signature.em_signature,
+                'connection_behavior': signature.timing_analysis
+            }
+            self.preserve_metadata(metadata)
+            
+    def detect_hardware_anomalies(self, signature):
+        return signature not in self.baseline_devices
+            </div>
+
+            <div class="metadata-grid">
+                <div class="metadata-card">
+                    <h3>📊 Captured Metadata</h3>
+                    <ul>
+                        <li>Device enumeration timestamps</li>
+                        <li>Hardware vendor signatures</li>
+                        <li>Electromagnetic fingerprints</li>
+                        <li>Connection timing patterns</li>
+                        <li>Power consumption profiles</li>
+                    </ul>
+                </div>
+                <div class="metadata-card">
+                    <h3>🔒 Security Benefits</h3>
+                    <ul>
+                        <li>Detects USB-based attacks</li>
+                        <li>Forensic evidence preservation</li>
+                        <li>Hardware tampering alerts</li>
+                        <li>Baseline deviation analysis</li>
+                        <li>Immutable audit trail</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h1>Layer 2: NFC Authentication Gateway</h1>
+            
+            <h2>🏷️ Physical Security Implementation</h2>
+            <p>The NFC Authentication Gateway requires physical possession of authorized NFC tags before any WiFi connection can be established. This creates an unbreakable physical security barrier that remote attackers cannot bypass.</p>
+
+            <div class="layer-diagram">
+                <h3>NFC Authentication Flow</h3>
+                <div class="nfc-flow">
+                    <div class="nfc-step">
+                        <strong>NFC Tag Detection</strong><br>
+                        Scan for authorized tags
+                    </div>
+                    <div class="arrow">→</div>
+                    <div class="nfc-step">
+                        <strong>Cryptographic Verification</strong><br>
+                        Validate tag authenticity
+                    </div>
+                    <div class="arrow">→</div>
+                    <div class="nfc-step">
+                        <strong>Session Token Generation</strong><br>
+                        Create time-limited auth token
+                    </div>
+                    <div class="arrow">→</div>
+                    <div class="nfc-step">
+                        <strong>WiFi Gateway Unlock</strong><br>
+                        Enable network connections
+                    </div>
+                </div>
+            </div>
+
+            <div class="security-feature">
+                <strong>🛡️ Anti-Cloning Protection:</strong> Each NFC tag contains unique cryptographic keys that cannot be duplicated without physical access to the secure element.
+            </div>
+
+            <div class="security-feature">
+                <strong>⏰ Time-Limited Sessions:</strong> Authentication tokens expire automatically, requiring periodic re-authentication to maintain network access.
+            </div>
+
+            <div class="security-feature">
+                <strong>🔐 Multi-Factor Security:</strong> Combines "something you have" (NFC tag) with "something you know" (network credentials) for robust authentication.
+            </div>
+
+            <h2>🔧 Integration Architecture</h2>
+            <p>Layers 1 and 2 work synergistically - USB monitoring ensures the authentication hardware hasn't been compromised, while NFC authentication ensures only authorized users can initiate network connections. This dual-layer approach creates a security foundation that subsequent layers build upon.</p>
+        </div>
+
+        <div class="footer">
+            <p><strong>AIMF LLC</strong> | StealthShark Technical Architecture | <strong>Layers 1-2 Deep Dive</strong></p>
+        </div>
+    </div>
+    
+    <div class="page-number">Page 2 of 5</div>
+</body>
+</html>

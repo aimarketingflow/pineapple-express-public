@@ -1,12 +1,10 @@
-# Byte-compiled / optimized / DLL files
+# StealthShark & LoopbackShark Combined .gitignore
+
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
-
-# C extensions
 *.so
-
-# Distribution / packaging
 .Python
 build/
 develop-eggs/
@@ -103,6 +101,8 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+*venv/
+*_venv/
 
 # Spyder project settings
 .spyderproject
@@ -122,13 +122,52 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
 # StealthShark specific
 *.pcap
 *.pcapng
-.DS_Store
 *.bak
 temp/
 logs/
 captures/
 private_configs/
 user_data/
+
+# LoopbackShark specific
+analysis_results/*.json
+analysis_results/*.md
+pcap_captures/*.pcap
+pcap_captures/*.pcapng
+persistent_logs/*.log
+gui_logs/*.log
+test_capture/*.pcap
+test_capture/*.pcapng
+
+# Settings (may contain user paths)
+loopbackshark_settings.json
+
+# Temporary files
+*.tmp
+*.temp
+
+# Large files
+*.gz
+*.zip
+*.tar
+*.tar.gz
+*.tar.bz2

@@ -1,10 +1,4 @@
 {
-  "72:13:01:8A:70:DA": {
-    "reason": "TRUSTED_NETWORK",
-    "timestamp": "2025-09-09T14:32:34.872829",
-    "status": "protected",
-    "ssid": "RoomForSaints"
-  },
   "83:F6": {
     "reason": "PINEAPPLE_ATTACK_DETECTED",
     "timestamp": "2025-09-09T14:32:34.875951",

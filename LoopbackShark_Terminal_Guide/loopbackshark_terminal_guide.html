@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LoopbackShark Terminal Guide - AIMF LLC</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #0d1117;
+            color: #c9d1d9;
+        }
+        h1, h2, h3 { color: #58a6ff; }
+        h1 { border-bottom: 2px solid #21262d; padding-bottom: 10px; }
+        code {
+            background-color: #21262d;
+            color: #f0f6fc;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'SFMono-Regular', Consolas, monospace;
+        }
+        pre {
+            background-color: #21262d;
+            color: #f0f6fc;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            border-left: 4px solid #58a6ff;
+        }
+        .command-section {
+            background-color: #161b22;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border: 1px solid #30363d;
+        }
+        .highlight { color: #7ee787; }
+        .warning { color: #f85149; }
+        .info { color: #79c0ff; }
+    </style>
+</head>
+<body>
+    <h1>🦈 LoopbackShark Terminal Guide</h1>
+    <p><strong>AIMF LLC - Advanced Network Analytics</strong></p>
+
+    <div class="command-section">
+        <h2>🚀 Quick Start Commands</h2>
+        
+        <h3>GUI Mode</h3>
+        <pre><code># Launch LoopbackShark GUI
+python3 loopbackshark_gui.py
+
+# Or use desktop launcher
+./LoopbackShark.command</code></pre>
+
+        <h3>CLI Mode - Basic Commands</h3>
+        <pre><code># Basic 30-minute loopback monitoring
+python3 cli_loopbackshark.py --duration 1800
+
+# Quick 5-minute test
+python3 cli_loopbackshark.py --duration 300
+
+# Run diagnostic test
+python3 cli_loopbackshark.py --diagnostic</code></pre>
+    </div>
+
+    <div class="command-section">
+        <h2>⚡ Advanced CLI Options</h2>
+        <pre><code># Monitor specific ports with debug logging
+python3 cli_loopbackshark.py --port-filter 3000,8080,9000 --debug
+
+# TCP-only monitoring for 2 hours  
+python3 cli_loopbackshark.py --duration 7200 --protocol tcp
+
+# Full day monitoring with custom output directory
+python3 cli_loopbackshark.py --duration 86400 --output-dir ./daily_analysis
+
+# Monitor database ports for 1 hour
+python3 cli_loopbackshark.py --port-filter 3306,5432,6379,27017 --duration 3600</code></pre>
+    </div>
+
+    <div class="command-section">
+        <h2>🔧 Setup Commands</h2>
+        <pre><code># Create virtual environment
+python3 -m venv venv_loopbackshark
+
+# Activate virtual environment  
+source venv_loopbackshark/bin/activate
+
+# Install dependencies
+pip3 install -r requirements_loopbackshark.txt
+
+# Make launcher executable
+chmod +x LoopbackShark.command</code></pre>
+    </div>
+
+    <div class="command-section">
+        <h2>🔗 Useful Aliases</h2>
+        <p>Add these to your <code>~/.zshrc</code> or <code>~/.bash_profile</code>:</p>
+        <pre><code># LoopbackShark aliases
+alias lbshark='cd /path/to/LoopbackShark && python3 cli_loopbackshark.py'
+alias lbshark-gui='cd /path/to/LoopbackShark && python3 loopbackshark_gui.py'
+alias lbshark-test='cd /path/to/LoopbackShark && python3 cli_loopbackshark.py --diagnostic'
+alias lbshark-dev='cd /path/to/LoopbackShark && python3 cli_loopbackshark.py --port-filter 3000,8080,8081,9000 --duration 3600'</code></pre>
+    </div>
+
+    <div class="command-section">
+        <h2>🔌 Common Port Filters</h2>
+        <pre><code># Development servers
+--port-filter 3000,8000,8080,9000
+
+# Databases  
+--port-filter 3306,5432,6379,27017
+
+# Web services
+--port-filter 80,443,8080,8443
+
+# Development stack
+--port-filter 3000,3001,8080,9000,5432,6379</code></pre>
+    </div>
+
+    <div class="command-section">
+        <h2>📊 Output Analysis</h2>
+        <pre><code># View generated reports
+ls -la analysis_results/
+
+# Check capture files
+ls -la pcap_captures/
+
+# View session logs
+ls -la persistent_logs/
+
+# Open latest analysis report
+open analysis_results/loopback_summary_*.md</code></pre>
+    </div>
+
+    <div class="command-section">
+        <h2>🔍 Troubleshooting</h2>
+        <pre><code># Check if tshark is installed
+which tshark
+
+# Check loopback interface
+ifconfig lo0
+
+# Check permissions (if needed)
+sudo python3 cli_loopbackshark.py --diagnostic
+
+# Clean up test files
+rm -rf test_capture/</code></pre>
+    </div>
+
+    <hr style="border: 1px solid #21262d; margin: 40px 0;">
+    <p><em>LoopbackShark Terminal Guide - AIMF LLC</em></p>
+</body>
+</html>

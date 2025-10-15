@@ -1,0 +1,22 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=StealthShark Anti-Pineapple
+Comment=Advanced WiFi security tool to detect and block pineapple attacks
+Exec=%INSTALL_DIR%/launch.sh
+Icon=%INSTALL_DIR%/Desktop_Shortcuts/stealthshark-icon.png
+Path=%INSTALL_DIR%
+Terminal=true
+Categories=Network;Security;System;
+Keywords=wifi;security;pineapple;detection;network;
+StartupNotify=true
+MimeType=text/csv;
+Actions=ImportCSV;ManageBlacklist;
+
+[Desktop Action ImportCSV]
+Name=Import CSV Threats
+Exec=%INSTALL_DIR%/launch.sh --import-csv
+
+[Desktop Action ManageBlacklist]
+Name=Manage Blacklist
+Exec=%INSTALL_DIR%/launch.sh --manage-blacklist

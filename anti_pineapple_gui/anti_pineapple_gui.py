@@ -50,10 +50,10 @@ class NetworkMonitorThread(QThread):
     network_update = pyqtSignal(list)
     threat_detected = pyqtSignal(dict)
     
-    def __init__(self, legitimate_bssid="72:13:01:8A:70:DA"):
+    def __init__(self, legitimate_bssid=None):
         super().__init__()
         self.legitimate_bssid = legitimate_bssid
-        self.legitimate_ssid = "RoomForSaints"
+        self.legitimate_ssid = None  # Set your trusted network SSID here
         self.allowed_channel = 44  # 5 GHz only
         self.blocked_bands = ["2.4GHz"]  # Block all 2.4 GHz
         self.running = True
