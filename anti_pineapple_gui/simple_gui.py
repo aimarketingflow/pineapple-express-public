@@ -22,6 +22,10 @@ from PyQt6.QtGui import *
 # Fix Qt font issues on macOS
 os.environ['QT_QPA_FONTDIR'] = '/System/Library/Fonts'
 
+# Import hotspot blocker module
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from hotspot_blocker_module import HotspotBlockerThread
+
 print("🚀 Starting Simple Anti-Pineapple GUI...")
 
 class NetworkMonitorThread(QThread):
@@ -338,6 +342,10 @@ class SimpleAntiPineappleGUI(QMainWindow):
         # Add CSV Import tab
         self.csv_tab = self.create_csv_tab()
         self.tabs.addTab(self.csv_tab, "📂 CSV Import")
+        
+        # Add Hotspot Blocker tab
+        self.hotspot_tab = self.create_hotspot_blocker_tab()
+        self.tabs.addTab(self.hotspot_tab, "📱 Hotspot Blocker")
         
         layout.addWidget(self.tabs)
         
@@ -979,6 +987,250 @@ class SimpleAntiPineappleGUI(QMainWindow):
         
         widget.setLayout(layout)
         return widget
+    
+    def create_hotspot_blocker_tab(self):
+        """Create iPhone Hotspot Blocker tab"""
+        widget = QWidget()
+        layout = QVBoxLayout()
+        
+        # Initialize hotspot blocker thread
+        self.hotspot_blocker = HotspotBlockerThread()
+        self.hotspot_blocker.hotspot_detected.connect(self.on_hotspot_detected)
+        self.hotspot_blocker.hotspot_blocked.connect(self.on_hotspot_blocked)
+        self.hotspot_blocker.status_update.connect(self.on_hotspot_status)
+        self.hotspot_blocker.start()
+        
+        # Header
+        header = QLabel("📱 iPhone Hotspot Blocker")
+        header.setStyleSheet("font-size: 20px; font-weight: bold; color: #ff9800; padding: 10px;")
+        header.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(header)
+        
+        # Description
+        desc = QLabel("Actively scans for and blocks iPhone hotspot connections")
+        desc.setStyleSheet("color: #a0a0a0; padding: 5px;")
+        desc.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(desc)
+        
+        # Control Panel
+        control_group = QGroupBox("🎛️ Control Panel")
+        control_layout = QVBoxLayout()
+        
+        # Toggle button
+        self.hotspot_toggle_btn = QPushButton("🚀 Start Hotspot Blocker")
+        self.hotspot_toggle_btn.clicked.connect(self.toggle_hotspot_blocker)
+        self.hotspot_toggle_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #1b5e20;
+                color: #a5d6a7;
+                padding: 15px;
+                font-size: 16px;
+                font-weight: bold;
+                border-radius: 8px;
+            }
+            QPushButton:hover { background-color: #2e7d32; }
+        """)
+        control_layout.addWidget(self.hotspot_toggle_btn)
+        
+        # Status
+        status_layout = QHBoxLayout()
+        status_label = QLabel("Status:")
+        self.hotspot_status_label = QLabel("⚪ Inactive")
+        self.hotspot_status_label.setStyleSheet("font-weight: bold; color: #757575;")
+        status_layout.addWidget(status_label)
+        status_layout.addWidget(self.hotspot_status_label)
+        status_layout.addStretch()
+        control_layout.addLayout(status_layout)
+        
+        control_group.setLayout(control_layout)
+        layout.addWidget(control_group)
+        
+        # Detection Patterns
+        pattern_group = QGroupBox("🔍 Detection Patterns")
+        pattern_layout = QVBoxLayout()
+        
+        self.hotspot_pattern_list = QListWidget()
+        self.hotspot_pattern_list.setStyleSheet("""
+            QListWidget {
+                background-color: #1e1e1e;
+                color: #ffffff;
+                border: 1px solid #555;
+                padding: 5px;
+            }
+        """)
+        for pattern in self.hotspot_blocker.iphone_patterns:
+            self.hotspot_pattern_list.addItem(pattern)
+        pattern_layout.addWidget(self.hotspot_pattern_list)
+        
+        # Add/Remove pattern controls
+        pattern_controls = QHBoxLayout()
+        self.hotspot_pattern_input = QLineEdit()
+        self.hotspot_pattern_input.setPlaceholderText("Enter regex pattern (e.g., .*MyPhone.*)")
+        pattern_controls.addWidget(self.hotspot_pattern_input)
+        
+        add_pattern_btn = QPushButton("➕ Add")
+        add_pattern_btn.clicked.connect(self.add_hotspot_pattern)
+        add_pattern_btn.setStyleSheet("QPushButton { background-color: #1976d2; color: white; padding: 8px; border-radius: 4px; }")
+        pattern_controls.addWidget(add_pattern_btn)
+        
+        remove_pattern_btn = QPushButton("➖ Remove")
+        remove_pattern_btn.clicked.connect(self.remove_hotspot_pattern)
+        remove_pattern_btn.setStyleSheet("QPushButton { background-color: #c62828; color: white; padding: 8px; border-radius: 4px; }")
+        pattern_controls.addWidget(remove_pattern_btn)
+        
+        pattern_layout.addLayout(pattern_controls)
+        pattern_group.setLayout(pattern_layout)
+        layout.addWidget(pattern_group)
+        
+        # Activity Log
+        log_group = QGroupBox("📋 Activity Log")
+        log_layout = QVBoxLayout()
+        
+        self.hotspot_log = QTextEdit()
+        self.hotspot_log.setReadOnly(True)
+        self.hotspot_log.setStyleSheet("""
+            QTextEdit {
+                background-color: #1e1e1e;
+                color: #00ff00;
+                border: 1px solid #555;
+                font-family: 'Courier New', monospace;
+                font-size: 11px;
+            }
+        """)
+        log_layout.addWidget(self.hotspot_log)
+        
+        clear_log_btn = QPushButton("🗑️ Clear Log")
+        clear_log_btn.clicked.connect(self.hotspot_log.clear)
+        clear_log_btn.setStyleSheet("QPushButton { background-color: #424242; color: #a0a0a0; padding: 8px; border-radius: 4px; }")
+        log_layout.addWidget(clear_log_btn)
+        
+        log_group.setLayout(log_layout)
+        layout.addWidget(log_group)
+        
+        # Statistics
+        stats_group = QGroupBox("📊 Statistics")
+        stats_layout = QHBoxLayout()
+        
+        self.hotspot_blocked_label = QLabel("🚫 Blocked: 0")
+        self.hotspot_blocked_label.setStyleSheet("color: #ff5252; font-size: 16px; font-weight: bold;")
+        stats_layout.addWidget(self.hotspot_blocked_label)
+        
+        self.hotspot_detected_label = QLabel("⚠️ Detected: 0")
+        self.hotspot_detected_label.setStyleSheet("color: #ffa726; font-size: 16px; font-weight: bold;")
+        stats_layout.addWidget(self.hotspot_detected_label)
+        
+        stats_group.setLayout(stats_layout)
+        layout.addWidget(stats_group)
+        
+        # Nearby Hotspots
+        nearby_group = QGroupBox("📡 Nearby iPhone Hotspots")
+        nearby_layout = QVBoxLayout()
+        
+        nearby_desc = QLabel("🔍 Active scanning - updates every 10 seconds")
+        nearby_desc.setStyleSheet("color: #a0a0a0; font-size: 11px; font-style: italic;")
+        nearby_layout.addWidget(nearby_desc)
+        
+        self.hotspot_nearby_list = QListWidget()
+        self.hotspot_nearby_list.setStyleSheet("""
+            QListWidget {
+                background-color: #1e1e1e;
+                color: #ff9800;
+                border: 1px solid #555;
+                font-weight: bold;
+            }
+        """)
+        nearby_layout.addWidget(self.hotspot_nearby_list)
+        
+        nearby_group.setLayout(nearby_layout)
+        layout.addWidget(nearby_group)
+        
+        widget.setLayout(layout)
+        return widget
+    
+    def toggle_hotspot_blocker(self):
+        """Toggle hotspot blocker on/off"""
+        if self.hotspot_blocker.enabled:
+            self.hotspot_blocker.enabled = False
+            self.hotspot_toggle_btn.setText("🚀 Start Hotspot Blocker")
+            self.hotspot_toggle_btn.setStyleSheet("""
+                QPushButton {
+                    background-color: #1b5e20;
+                    color: #a5d6a7;
+                    padding: 15px;
+                    font-size: 16px;
+                    font-weight: bold;
+                    border-radius: 8px;
+                }
+                QPushButton:hover { background-color: #2e7d32; }
+            """)
+            self.hotspot_status_label.setText("⚪ Inactive")
+            self.hotspot_status_label.setStyleSheet("font-weight: bold; color: #757575;")
+            self.log_hotspot_message("🛑 Hotspot blocker stopped")
+        else:
+            self.hotspot_blocker.enabled = True
+            self.hotspot_toggle_btn.setText("⏹️ Stop Hotspot Blocker")
+            self.hotspot_toggle_btn.setStyleSheet("""
+                QPushButton {
+                    background-color: #c62828;
+                    color: white;
+                    padding: 15px;
+                    font-size: 16px;
+                    font-weight: bold;
+                    border-radius: 8px;
+                }
+                QPushButton:hover { background-color: #d32f2f; }
+            """)
+            self.hotspot_status_label.setText("🟢 Active")
+            self.hotspot_status_label.setStyleSheet("font-weight: bold; color: #4caf50;")
+            self.log_hotspot_message("✅ Hotspot blocker started - Active scanning enabled")
+    
+    def add_hotspot_pattern(self):
+        """Add new hotspot detection pattern"""
+        pattern = self.hotspot_pattern_input.text().strip()
+        if pattern:
+            self.hotspot_blocker.add_pattern(pattern)
+            self.hotspot_pattern_list.addItem(pattern)
+            self.hotspot_pattern_input.clear()
+            self.log_hotspot_message(f"➕ Added pattern: {pattern}")
+    
+    def remove_hotspot_pattern(self):
+        """Remove selected hotspot pattern"""
+        current_item = self.hotspot_pattern_list.currentItem()
+        if current_item:
+            pattern = current_item.text()
+            self.hotspot_blocker.remove_pattern(pattern)
+            self.hotspot_pattern_list.takeItem(self.hotspot_pattern_list.currentRow())
+            self.log_hotspot_message(f"➖ Removed pattern: {pattern}")
+    
+    def on_hotspot_detected(self, ssid):
+        """Handle hotspot detection"""
+        self.log_hotspot_message(f"⚠️ DETECTED: iPhone hotspot '{ssid}' nearby!")
+        current = int(self.hotspot_detected_label.text().split(": ")[1])
+        self.hotspot_detected_label.setText(f"⚠️ Detected: {current + 1}")
+        
+        # Add to nearby list
+        items = [self.hotspot_nearby_list.item(i).text() for i in range(self.hotspot_nearby_list.count())]
+        if f"📱 {ssid}" not in items:
+            self.hotspot_nearby_list.addItem(f"📱 {ssid}")
+            self.hotspot_nearby_list.sortItems()
+    
+    def on_hotspot_blocked(self, ssid):
+        """Handle hotspot blocking"""
+        self.log_hotspot_message(f"🚫 BLOCKED: '{ssid}' - Disconnected from network")
+        current = int(self.hotspot_blocked_label.text().split(": ")[1])
+        self.hotspot_blocked_label.setText(f"🚫 Blocked: {current + 1}")
+    
+    def on_hotspot_status(self, message):
+        """Handle hotspot status updates"""
+        self.log_hotspot_message(f"ℹ️ {message}")
+    
+    def log_hotspot_message(self, message):
+        """Add message to hotspot log"""
+        timestamp = datetime.now().strftime("%H:%M:%S")
+        self.hotspot_log.append(f"[{timestamp}] {message}")
+        cursor = self.hotspot_log.textCursor()
+        cursor.movePosition(cursor.MoveOperation.End)
+        self.hotspot_log.setTextCursor(cursor)
     
     def create_settings_tab(self):
         """Create settings configuration tab"""
