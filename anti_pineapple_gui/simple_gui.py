@@ -326,18 +326,17 @@ class SimpleAntiPineappleGUI(QMainWindow):
             }
         """)
         
-        # Create tabs
+        # Create tabs (Settings created last to appear on far right)
         self.dashboard_tab = self.create_dashboard_tab()
         self.auth_tab = self.create_auth_tab()
         self.tags_tab = self.create_tags_tab()
         # self.monitor_tab = self.create_monitor_tab()  # Removed - macOS privacy blocks WiFi scanning
-        self.settings_tab = self.create_settings_tab()
         
+        # Add tabs in order
         self.tabs.addTab(self.dashboard_tab, "🛡️ Dashboard")
         self.tabs.addTab(self.auth_tab, "🔐 NFC Auth")
         self.tabs.addTab(self.tags_tab, "🏷️ Tags")
         # self.tabs.addTab(self.monitor_tab, "📡 Monitor")  # Removed - macOS privacy blocks WiFi scanning
-        self.tabs.addTab(self.settings_tab, "⚙️ Settings")
         
         # Add CSV Import tab
         self.csv_tab = self.create_csv_tab()
@@ -346,6 +345,10 @@ class SimpleAntiPineappleGUI(QMainWindow):
         # Add Hotspot Blocker tab
         self.hotspot_tab = self.create_hotspot_blocker_tab()
         self.tabs.addTab(self.hotspot_tab, "📱 Hotspot Blocker")
+        
+        # Add Settings tab last (farthest right)
+        self.settings_tab = self.create_settings_tab()
+        self.tabs.addTab(self.settings_tab, "⚙️ Settings")
         
         layout.addWidget(self.tabs)
         
@@ -594,10 +597,28 @@ class SimpleAntiPineappleGUI(QMainWindow):
                 # Status
                 self.network_table.setItem(i, 3, status_item)
     
+    def create_scrollable_tab(self, content_widget):
+        """Wrap content in a scroll area"""
+        scroll = QScrollArea()
+        scroll.setWidget(content_widget)
+        scroll.setWidgetResizable(True)
+        scroll.setStyleSheet("""
+            QScrollArea {
+                border: none;
+                background-color: #1e1e1e;
+            }
+        """)
+        
+        wrapper = QWidget()
+        wrapper_layout = QVBoxLayout(wrapper)
+        wrapper_layout.setContentsMargins(0, 0, 0, 0)
+        wrapper_layout.addWidget(scroll)
+        return wrapper
+    
     def create_dashboard_tab(self):
         """Create the main dashboard tab"""
-        widget = QWidget()
-        layout = QVBoxLayout()
+        content = QWidget()
+        layout = QVBoxLayout(content)
         
         # Status indicator
         self.status_indicator = QLabel("⚠️ Not Authenticated")
@@ -691,13 +712,12 @@ class SimpleAntiPineappleGUI(QMainWindow):
         threat_group.setLayout(threat_layout)
         layout.addWidget(threat_group)
         
-        widget.setLayout(layout)
-        return widget
+        return self.create_scrollable_tab(content)
     
     def create_auth_tab(self):
         """Create NFC authentication tab"""
-        widget = QWidget()
-        layout = QVBoxLayout()
+        content = QWidget()
+        layout = QVBoxLayout(content)
         
         # Auth status
         auth_group = QGroupBox("Authentication Status")
@@ -740,13 +760,12 @@ class SimpleAntiPineappleGUI(QMainWindow):
         layout.addWidget(auth_btn)
         
         layout.addStretch()
-        widget.setLayout(layout)
-        return widget
+        return self.create_scrollable_tab(content)
     
     def create_tags_tab(self):
         """Create NFC tags management tab"""
-        widget = QWidget()
-        layout = QVBoxLayout()
+        content = QWidget()
+        layout = QVBoxLayout(content)
         
         # Header
         header = QLabel("🏷️ NFC Tag Management")
@@ -794,8 +813,7 @@ class SimpleAntiPineappleGUI(QMainWindow):
             layout.addWidget(tags_list)
         
         layout.addStretch()
-        widget.setLayout(layout)
-        return widget
+        return self.create_scrollable_tab(content)
     
     def create_monitor_tab(self):
         """Create network monitoring tab"""
@@ -889,8 +907,8 @@ class SimpleAntiPineappleGUI(QMainWindow):
     
     def create_csv_tab(self):
         """Create CSV import and blacklist management tab"""
-        widget = QWidget()
-        layout = QVBoxLayout()
+        content = QWidget()
+        layout = QVBoxLayout(content)
         
         # Header
         header = QLabel("📂 BSSID Blacklist Management")
@@ -985,13 +1003,12 @@ class SimpleAntiPineappleGUI(QMainWindow):
         # Load initial blacklist data
         self.refresh_blacklist_display()
         
-        widget.setLayout(layout)
-        return widget
+        return self.create_scrollable_tab(content)
     
     def create_hotspot_blocker_tab(self):
         """Create iPhone Hotspot Blocker tab"""
-        widget = QWidget()
-        layout = QVBoxLayout()
+        content = QWidget()
+        layout = QVBoxLayout(content)
         
         # Initialize hotspot blocker thread
         self.hotspot_blocker = HotspotBlockerThread()
@@ -1144,8 +1161,7 @@ class SimpleAntiPineappleGUI(QMainWindow):
         nearby_group.setLayout(nearby_layout)
         layout.addWidget(nearby_group)
         
-        widget.setLayout(layout)
-        return widget
+        return self.create_scrollable_tab(content)
     
     def toggle_hotspot_blocker(self):
         """Toggle hotspot blocker on/off"""
@@ -1234,8 +1250,8 @@ class SimpleAntiPineappleGUI(QMainWindow):
     
     def create_settings_tab(self):
         """Create settings configuration tab"""
-        widget = QWidget()
-        layout = QVBoxLayout()
+        content = QWidget()
+        layout = QVBoxLayout(content)
         
         # Header
         header = QLabel("⚙️ StealthShark Settings")
@@ -1488,8 +1504,7 @@ class SimpleAntiPineappleGUI(QMainWindow):
         layout.addLayout(control_layout)
         
         layout.addStretch()
-        widget.setLayout(layout)
-        return widget
+        return self.create_scrollable_tab(content)
     
     def refresh_blacklist_display(self):
         """Refresh the blacklist display table"""
