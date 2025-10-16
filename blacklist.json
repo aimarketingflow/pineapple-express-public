@@ -1,4 +1,16 @@
 {
+  "AA:BB:CC:DD:EE:FF": {
+    "reason": "TRUSTED_NETWORK",
+    "timestamp": "2025-10-15T21:00:00.000000",
+    "status": "protected",
+    "ssid": "MyHomeNetwork"
+  },
+  "11:22:33:44:55:66": {
+    "reason": "TRUSTED_NETWORK",
+    "timestamp": "2025-10-15T21:00:00.000000",
+    "status": "protected",
+    "ssid": "OfficeWiFi"
+  },
   "83:F6": {
     "reason": "PINEAPPLE_ATTACK_DETECTED",
     "timestamp": "2025-09-09T14:32:34.875951",

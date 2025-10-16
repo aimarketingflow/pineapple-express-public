@@ -5,25 +5,39 @@
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![Platform: macOS](https://img.shields.io/badge/platform-macOS-lightgrey.svg)](https://www.apple.com/macos/)
 
+## ⚠️ Important Notice: macOS Sequoia+ Privacy Restrictions
+
+**As of macOS Sequoia (15.0+), Apple has implemented system-level privacy protections that prevent applications from accessing WiFi network names (SSIDs) through standard APIs.** This is a security feature designed to protect user privacy, but it makes real-time WiFi threat detection impossible to implement.
+
+### Impact on StealthShark
+- ✅ **CSV Import/Export** - Still works perfectly for managing threat lists
+- ✅ **NFC Authentication** - Fully functional
+- ✅ **Blacklist Management** - Complete functionality maintained
+- ✅ **Settings & Configuration** - All features available
+- ❌ **Live WiFi Monitoring** - Disabled due to macOS privacy restrictions
+
+**Note**: This limitation affects all third-party WiFi monitoring tools on macOS Sequoia+, not just StealthShark. Apple's privacy protections redact WiFi network names in system APIs.
+
 ## 🎯 Overview
 
 This repository contains two powerful network monitoring and security applications:
 
 ### 🛡️ StealthShark Anti-Pineapple Detection System v1.1
-Advanced WiFi security tool designed to detect and block pineapple attacks, rogue access points, and other wireless threats. Provides real-time protection with automatic blacklist management and trusted network exclusion.
+Advanced WiFi security tool designed to detect and block pineapple attacks, rogue access points, and other wireless threats. Provides automatic blacklist management, NFC authentication, and CSV-based threat list imports.
 
 ### 🔍 LoopbackShark 
 Specialized localhost traffic monitor with pattern recognition capabilities for capturing, analyzing, and visualizing loopback interface communications.
 
 ## ✨ StealthShark Features
-- **🛡️ Real-time Pineapple Detection** - Identifies and blocks malicious WiFi access points
-- **⚙️ Settings Tab** - Configure monitoring duration (default: 6 hours) and auto-start
-- **🚀 Auto-Start Functionality** - Automatic launch at computer boot with LaunchAgent
-- **📂 CSV Import Protection** - Import threat lists while auto-protecting your current network
 - **🎯 BSSID Blacklist Management** - Persistent storage of blocked networks
+- **📂 CSV Import/Export** - Bulk import threat lists and manage blacklists
+- **🔐 NFC Authentication** - Secure access control with NFC tags
+- **🏷️ Tag Management** - Register and manage multiple NFC security tags
+- **⚙️ Settings Configuration** - Customize monitoring duration and auto-start behavior
+- **🚀 Auto-Start Functionality** - Automatic launch at computer boot with LaunchAgent
 - **🖥️ Desktop Integration** - Native .app bundle and .desktop shortcuts
-- **⚡ Live WiFi Scanning** - Real-time network monitoring with configurable intervals
-- **🔒 Auto-Exclusion** - Protects your trusted networks from accidental blocking
+- **🔒 Auto-Exclusion Protection** - Protects your trusted networks from accidental blocking
+- **📊 Dashboard Overview** - Real-time status and threat statistics
 
 ## 🔥 LoopbackShark Features
 - **🎯 Pattern Recognition** - Automatic detection of web servers, databases, APIs

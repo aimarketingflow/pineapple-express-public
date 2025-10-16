@@ -28,54 +28,160 @@ class NetworkMonitorThread(QThread):
     """Thread for continuous network monitoring"""
     network_update = pyqtSignal(list)
     threat_detected = pyqtSignal(dict)
+    log_message = pyqtSignal(str)
     
-    def __init__(self, legitimate_bssid="72:13:01:8A:70:DA"):
+    def __init__(self, legitimate_bssid="72:13:01:8A:70:DA", demo_mode=False, current_ssid=""):
         super().__init__()
         self.legitimate_bssid = legitimate_bssid
+        self.current_ssid = current_ssid
+        self.demo_mode = demo_mode
         self.running = True
+        self.scan_count = 0
     
     def run(self):
+        self.log_message.emit("🚀 Network monitoring started")
+        self.log_message.emit(f"🛡️ Protected network: {self.current_ssid} ({self.legitimate_bssid})")
+        self.log_message.emit(f"⏱️ Scan interval: 5 seconds")
+        self.log_message.emit("━" * 60)
+        
         while self.running:
             try:
-                networks = self.scan_networks()
-                self.network_update.emit(networks)
+                self.scan_count += 1
+                self.log_message.emit(f"\n🔍 Scan #{self.scan_count} - {datetime.now().strftime('%H:%M:%S')}")
                 
-                for network in networks:
-                    if self.is_threat(network):
-                        self.threat_detected.emit(network)
+                networks = self.scan_networks()
+                self.log_message.emit(f"📡 Found {len(networks)} networks")
+                
+                if networks:
+                    for network in networks:
+                        status = self.get_network_status(network)
+                        self.log_message.emit(f"  • {network['ssid'][:20]:20} | {network['bssid']} | {network['rssi']:3}dBm | {status}")
+                        
+                        if self.is_threat(network):
+                            self.log_message.emit(f"  🚨 THREAT DETECTED: {network['ssid']} ({network['bssid']})")
+                            self.threat_detected.emit(network)
+                else:
+                    self.log_message.emit("  ℹ️ No networks detected")
+                
+                self.network_update.emit(networks)
+                self.log_message.emit(f"✅ Scan complete. Next scan in 5 seconds...")
                 
                 time.sleep(5)
             except Exception as e:
-                print(f"Monitor error: {e}")
+                self.log_message.emit(f"❌ Monitor error: {e}")
+                import traceback
+                self.log_message.emit(traceback.format_exc())
                 time.sleep(10)
     
     def scan_networks(self):
-        """Scan for WiFi networks"""
+        """Scan for REAL WiFi networks using system_profiler"""
         try:
-            cmd = ["/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport", "-s"]
-            result = subprocess.run(cmd, capture_output=True, text=True)
+            # Use system_profiler (works on all macOS versions)
+            cmd = ["system_profiler", "SPAirPortDataType"]
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=15)
+            
+            if result.returncode != 0:
+                self.log_message.emit(f"⚠️ Scan failed with return code: {result.returncode}")
+                return []
             
             networks = []
-            for line in result.stdout.strip().split('\n')[1:]:
-                parts = line.split()
-                if len(parts) >= 7:
-                    networks.append({
-                        'ssid': parts[0],
-                        'bssid': parts[1],
-                        'rssi': int(parts[2]),
-                        'channel': parts[3],
-                        'security': ' '.join(parts[6:])
-                    })
+            output = result.stdout
+            
+            # Parse system_profiler output for "Other Local Wi-Fi Networks:" section
+            if "Other Local Wi-Fi Networks:" in output:
+                in_networks_section = False
+                current_network = {}
+                
+                for line in output.split('\n'):
+                    line_stripped = line.strip()
+                    
+                    if "Other Local Wi-Fi Networks:" in line:
+                        in_networks_section = True
+                        continue
+                    
+                    if in_networks_section:
+                        # Stop at next major section (not indented)
+                        if line and not line.startswith(' ') and not line.startswith('\t'):
+                            if current_network and 'ssid' in current_network:
+                                networks.append(current_network)
+                            break
+                        
+                        # Network name (indented, ends with colon)
+                        if line_stripped and line_stripped.endswith(':') and not any(x in line_stripped for x in ['PHY Mode', 'Channel', 'Security', 'Network Type', 'Signal']):
+                            # Save previous network
+                            if current_network and 'ssid' in current_network:
+                                networks.append(current_network)
+                            # Start new network
+                            current_network = {'ssid': line_stripped[:-1]}  # Remove trailing colon
+                        
+                        elif 'PHY Mode:' in line:
+                            # Just note it exists
+                            pass
+                        elif 'Channel:' in line:
+                            try:
+                                channel_part = line.split(':', 1)[1].strip()
+                                # Extract just the channel number
+                                channel = channel_part.split()[0]
+                                current_network['channel'] = channel
+                            except:
+                                current_network['channel'] = 'Unknown'
+                        elif 'Security:' in line:
+                            security = line.split(':', 1)[1].strip()
+                            current_network['security'] = security
+                        elif 'Signal' in line and 'dBm' in line:
+                            try:
+                                # Signal / Noise: -45 dBm / -92 dBm
+                                signal_part = line.split(':')[1].strip()
+                                rssi = int(signal_part.split()[0])
+                                current_network['rssi'] = rssi
+                            except:
+                                pass
+                
+                # Add last network
+                if current_network and 'ssid' in current_network:
+                    networks.append(current_network)
+            
+            # Fill in missing fields with defaults
+            for network in networks:
+                if 'bssid' not in network:
+                    # Generate a placeholder BSSID based on SSID hash
+                    import hashlib
+                    ssid_hash = hashlib.md5(network['ssid'].encode()).hexdigest()
+                    network['bssid'] = ':'.join([ssid_hash[i:i+2] for i in range(0, 12, 2)]).upper()
+                if 'rssi' not in network:
+                    network['rssi'] = -70
+                if 'channel' not in network:
+                    network['channel'] = 'Unknown'
+                if 'security' not in network:
+                    network['security'] = 'Unknown'
+            
             return networks
-        except:
+            
+        except subprocess.TimeoutExpired:
+            self.log_message.emit("⏱️ Scan timed out after 15 seconds")
             return []
+        except Exception as e:
+            self.log_message.emit(f"❌ Scan error: {e}")
+            return []
+    
+    def get_network_status(self, network):
+        """Get network status string"""
+        if network['bssid'] == self.legitimate_bssid:
+            return "🛡️ PROTECTED"
+        if self.is_threat(network):
+            return "🚨 THREAT"
+        if 'Open' in network.get('security', ''):
+            return "⚠️ SUSPICIOUS"
+        return "✅ SAFE"
     
     def is_threat(self, network):
         """Check if network is a potential threat"""
-        if network['ssid'] == 'WhySoSeriousi' and network['bssid'] != self.legitimate_bssid:
+        # Check for pineapple attack - same SSID as protected network but different BSSID
+        if network['ssid'] == self.current_ssid and network['bssid'] != self.legitimate_bssid:
             return True
         
-        suspicious_patterns = ['pineapple', 'open', 'free', 'public']
+        # Check for suspicious patterns with open security
+        suspicious_patterns = ['pineapple', 'free wifi', 'public']
         if any(pattern in network['ssid'].lower() for pattern in suspicious_patterns):
             if 'Open' in network.get('security', ''):
                 return True
@@ -89,16 +195,22 @@ class NetworkMonitorThread(QThread):
 class SimpleAntiPineappleGUI(QMainWindow):
     """Enhanced GUI for Anti-Pineapple BSSID NFC Security System"""
     
-    def __init__(self):
+    def __init__(self, demo_mode=False):
         print("🔧 Initializing Enhanced GUI...")
         super().__init__()
         
-        self.setWindowTitle("🛡️ Anti-Pineapple Security System")
+        self.demo_mode = demo_mode
+        if demo_mode:
+            self.setWindowTitle("🛡️ Anti-Pineapple Security System [DEMO MODE]")
+            print("📺 Running in DEMO MODE with placeholder data")
+        else:
+            self.setWindowTitle("🛡️ Anti-Pineapple Security System")
+        
         self.setGeometry(100, 100, 1000, 700)
         
         # Get current connected network info for auto-exclusion
-        self.legitimate_bssid = "72:13:01:8A:70:DA"  # WhySoSeriousi network
-        self.current_ssid = "WhySoSeriousi" 
+        self.legitimate_bssid = "AA:BB:CC:DD:EE:FF" if demo_mode else "72:13:01:8A:70:DA"
+        self.current_ssid = "MyHomeNetwork" if demo_mode else "WhySoSeriousi" 
         self.threat_count = 0
         self.authenticated = False
         self.firewall_enabled = False
@@ -136,7 +248,7 @@ class SimpleAntiPineappleGUI(QMainWindow):
         self.update_usb_status()
         print("✅ USB status updated")
         self.check_auto_authentication()
-        self.start_monitoring()
+        # self.start_monitoring()  # Removed - macOS privacy blocks WiFi scanning
         
     def init_ui(self):
         """Initialize the simplified user interface"""
@@ -214,13 +326,13 @@ class SimpleAntiPineappleGUI(QMainWindow):
         self.dashboard_tab = self.create_dashboard_tab()
         self.auth_tab = self.create_auth_tab()
         self.tags_tab = self.create_tags_tab()
-        self.monitor_tab = self.create_monitor_tab()
+        # self.monitor_tab = self.create_monitor_tab()  # Removed - macOS privacy blocks WiFi scanning
         self.settings_tab = self.create_settings_tab()
         
         self.tabs.addTab(self.dashboard_tab, "🛡️ Dashboard")
         self.tabs.addTab(self.auth_tab, "🔐 NFC Auth")
         self.tabs.addTab(self.tags_tab, "🏷️ Tags")
-        self.tabs.addTab(self.monitor_tab, "📡 Monitor")
+        # self.tabs.addTab(self.monitor_tab, "📡 Monitor")  # Removed - macOS privacy blocks WiFi scanning
         self.tabs.addTab(self.settings_tab, "⚙️ Settings")
         
         # Add CSV Import tab
@@ -720,13 +832,35 @@ class SimpleAntiPineappleGUI(QMainWindow):
         """)
         layout.addWidget(self.network_table)
         
+        # Monitoring log (verbose)
+        monitor_log_label = QLabel("📋 Monitoring Log (Verbose):")
+        monitor_log_label.setStyleSheet("color: #4fc3f7; font-weight: bold; font-size: 14px; margin-top: 10px;")
+        layout.addWidget(monitor_log_label)
+        
+        self.monitor_log = QTextEdit()
+        self.monitor_log.setMaximumHeight(200)
+        self.monitor_log.setReadOnly(True)
+        self.monitor_log.setStyleSheet("""
+            QTextEdit {
+                background-color: #1a1a1a;
+                color: #00ff00;
+                border: 2px solid #4fc3f7;
+                border-radius: 5px;
+                padding: 5px;
+                font-family: monospace;
+                font-size: 11px;
+            }
+        """)
+        self.monitor_log.append("[System] Initializing monitoring system...")
+        layout.addWidget(self.monitor_log)
+        
         # Threat log
-        threat_log_label = QLabel("🚨 Live Threat Detection Log:")
+        threat_log_label = QLabel("🚨 Threat Detection Log:")
         threat_log_label.setStyleSheet("color: #ff5252; font-weight: bold; font-size: 14px; margin-top: 10px;")
         layout.addWidget(threat_log_label)
         
         self.threat_log = QTextEdit()
-        self.threat_log.setMaximumHeight(150)
+        self.threat_log.setMaximumHeight(100)
         self.threat_log.setReadOnly(True)
         self.threat_log.setStyleSheet("""
             QTextEdit {
@@ -736,10 +870,10 @@ class SimpleAntiPineappleGUI(QMainWindow):
                 border-radius: 5px;
                 padding: 5px;
                 font-family: monospace;
-                font-size: 12px;
+                font-size: 11px;
             }
         """)
-        self.threat_log.append("[System] Live threat monitoring started...")
+        self.threat_log.append("[System] Threat detection active...")
         layout.addWidget(self.threat_log)
         
         widget.setLayout(layout)
@@ -1205,23 +1339,71 @@ class SimpleAntiPineappleGUI(QMainWindow):
     
     def load_registered_tags(self):
         """Load registered NFC tags"""
-        if self.tags_path.exists():
+        if self.demo_mode:
+            # Load demo tags
+            self.registered_tags = [
+                {
+                    "name": "Home Security Tag",
+                    "created": "2025-10-01T10:30:00",
+                    "network_binding": {
+                        "ssid": "MyHomeNetwork",
+                        "bssid": "AA:BB:CC:DD:EE:FF"
+                    }
+                },
+                {
+                    "name": "Office Access Tag",
+                    "created": "2025-10-05T14:15:00",
+                    "network_binding": {
+                        "ssid": "OfficeWiFi",
+                        "bssid": "11:22:33:44:55:66"
+                    }
+                },
+                {
+                    "name": "Mobile Backup Tag",
+                    "created": "2025-10-10T09:00:00",
+                    "network_binding": {
+                        "ssid": "MyHomeNetwork",
+                        "bssid": "AA:BB:CC:DD:EE:FF"
+                    }
+                }
+            ]
+        elif self.tags_path.exists():
             try:
                 with open(self.tags_path, 'r') as f:
                     self.registered_tags = json.load(f)
             except:
                 self.registered_tags = []
+        else:
+            self.registered_tags = []
     
     def detect_current_network(self):
         """Detect current network BSSID"""
         try:
-            result = subprocess.run(['system_profiler', 'SPAirPortDataType'], capture_output=True, text=True)
-            if "WhySoSeriousi" in result.stdout:
-                print("✅ Connected to WhySoSeriousi network")
-            else:
-                print("⚠️ Not connected to expected network")
-        except:
-            print("⚠️ Could not detect network")
+            result = subprocess.run(['system_profiler', 'SPAirPortDataType'], capture_output=True, text=True, timeout=10)
+            
+            # Parse for current network info
+            in_current_section = False
+            for line in result.stdout.split('\n'):
+                line_stripped = line.strip()
+                
+                if "Current Network Information:" in line:
+                    in_current_section = True
+                    continue
+                
+                if in_current_section:
+                    # Look for network name (ends with colon, indented)
+                    if line_stripped and line_stripped.endswith(':') and not any(x in line_stripped for x in ['PHY Mode', 'Channel', 'Security', 'Network Type', 'Signal']):
+                        self.current_ssid = line_stripped[:-1]  # Remove trailing colon
+                        print(f"✅ Connected to: {self.current_ssid}")
+                    
+                    # Stop at next major section
+                    if line and not line.startswith(' ') and not line.startswith('\t') and in_current_section and self.current_ssid:
+                        break
+            
+            if not self.current_ssid:
+                print("⚠️ Not connected to WiFi")
+        except Exception as e:
+            print(f"⚠️ Could not detect network: {e}")
     
     def check_auto_authentication(self):
         """Check for auto-authentication"""
@@ -1230,9 +1412,14 @@ class SimpleAntiPineappleGUI(QMainWindow):
     
     def start_monitoring(self):
         # Network monitoring thread
-        self.monitor_thread = NetworkMonitorThread()
+        self.monitor_thread = NetworkMonitorThread(
+            legitimate_bssid=self.legitimate_bssid,
+            demo_mode=self.demo_mode,
+            current_ssid=self.current_ssid
+        )
         self.monitor_thread.network_update.connect(self.update_network_table)
         self.monitor_thread.threat_detected.connect(self.handle_threat)
+        self.monitor_thread.log_message.connect(self.append_monitor_log)
         self.monitor_thread.start()
         
         # Real-time scanner timer
@@ -1240,26 +1427,70 @@ class SimpleAntiPineappleGUI(QMainWindow):
         self.scan_timer.timeout.connect(self.perform_live_scan)
         self.scan_timer.start(5000)  # Scan every 5 seconds for live threats
     
+    def append_monitor_log(self, message):
+        """Append message to monitor log"""
+        if hasattr(self, 'monitor_log'):
+            self.monitor_log.append(message)
+            # Auto-scroll to bottom
+            scrollbar = self.monitor_log.verticalScrollBar()
+            scrollbar.setValue(scrollbar.maximum())
+    
     def update_network_table(self, networks):
         """Update network monitoring table"""
         if hasattr(self, 'network_table'):
             self.network_table.setRowCount(len(networks))
             
             for i, network in enumerate(networks):
+                # SSID
                 self.network_table.setItem(i, 0, QTableWidgetItem(network['ssid']))
+                
+                # BSSID
                 self.network_table.setItem(i, 1, QTableWidgetItem(network['bssid']))
+                
+                # Signal
                 self.network_table.setItem(i, 2, QTableWidgetItem(f"{network['rssi']} dBm"))
-                self.network_table.setItem(i, 3, QTableWidgetItem(network['channel']))
                 
-                # Status
+                # Status - match the monitor thread logic
                 if network['bssid'] == self.legitimate_bssid:
-                    status = "✅ Protected"
-                elif network['bssid'] in self.blocked_bssids:
-                    status = "🚫 Blocked"
+                    status = "🛡️ PROTECTED"
+                    # Highlight protected network in green
+                    for col in range(4):
+                        item = self.network_table.item(i, col)
+                        if item:
+                            item.setBackground(QColor(0, 100, 0, 100))  # Dark green background
+                elif self.is_threat_network(network):
+                    status = "🚨 THREAT"
+                    # Highlight threat in red
+                    for col in range(4):
+                        item = self.network_table.item(i, col)
+                        if item:
+                            item.setBackground(QColor(139, 0, 0, 100))  # Dark red background
+                elif 'Open' in network.get('security', ''):
+                    status = "⚠️ SUSPICIOUS"
+                    # Highlight suspicious in yellow
+                    for col in range(4):
+                        item = self.network_table.item(i, col)
+                        if item:
+                            item.setBackground(QColor(139, 139, 0, 80))  # Dark yellow background
                 else:
-                    status = "⚡ Unprotected"
+                    status = "✅ SAFE"
                 
-                self.network_table.setItem(i, 4, QTableWidgetItem(status))
+                status_item = QTableWidgetItem(status)
+                self.network_table.setItem(i, 3, status_item)
+    
+    def is_threat_network(self, network):
+        """Check if network is a threat"""
+        # Check for pineapple attack - same SSID as protected network but different BSSID
+        if network['ssid'] == self.current_ssid and network['bssid'] != self.legitimate_bssid:
+            return True
+        
+        # Check for suspicious patterns with open security
+        suspicious_patterns = ['pineapple', 'free wifi', 'public']
+        if any(pattern in network['ssid'].lower() for pattern in suspicious_patterns):
+            if 'Open' in network.get('security', ''):
+                return True
+        
+        return False
     
     def handle_threat(self, threat_network):
         """Handle detected threats"""
@@ -1621,11 +1852,15 @@ class SimpleAntiPineappleGUI(QMainWindow):
 
 def main():
     print("🚀 Starting Simple GUI application...")
+    
+    # Check for demo mode flag
+    demo_mode = '--demo' in sys.argv or '--demo-mode' in sys.argv
+    
     app = QApplication(sys.argv)
     app.setStyle('Fusion')
     
     try:
-        window = SimpleAntiPineappleGUI()
+        window = SimpleAntiPineappleGUI(demo_mode=demo_mode)
         window.show()
         print("✅ Simple GUI launched successfully!")
     except Exception as e:
